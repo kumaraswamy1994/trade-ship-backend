@@ -1,8 +1,8 @@
 FROM python:3.11-slim
 WORKDIR /app
-COPY transport/requirements.txt ./
+COPY core/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-COPY transport /app
+COPY core /app
 COPY shared_utils /app/shared_utils
 ENV PYTHONPATH="/app"
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
