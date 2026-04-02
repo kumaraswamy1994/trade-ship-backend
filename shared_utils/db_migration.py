@@ -25,10 +25,17 @@ def migrate_db():
             applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     """)
+    applied = []
+    cur.execute("SELECT version FROM schema_migrations;")
+    applied_versions = {row[0] for row in cur.fetchall()}
     for sql_file in sorted(sql_files):
+        if sql_file in applied_versions:
+            continue
         with open(os.path.join(sql_dir, sql_file), "r") as f:
             cur.execute(f.read())
+        cur.execute("INSERT INTO schema_migrations (version) VALUES (%s)", (sql_file,))
+        applied.append(sql_file)
     conn.commit()
     cur.close()
     conn.close()
-    return {"status": "migrations applied", "files": sql_files}
+    return {"status": "migrations applied", "files": applied}
